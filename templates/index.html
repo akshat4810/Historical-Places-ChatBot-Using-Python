@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Historical Places ChatBot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #chat-container {
+            width: 80%;
+            max-width: 600px; /* Limit the width to provide better readability */
+            height: calc(100vh - 20px); /* Adjusting height for margin */
+            margin: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-box {
+            flex: 1; /* Expand to fill remaining space */
+            border: 1px solid #007bff;
+            padding: 20px;
+            overflow-y: scroll;
+            background-color: #e9ecef;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        #user-input-container {
+            display: flex;
+            background-color: #007bff;
+            padding: 10px;
+        }
+        #user-input {
+            flex: 1; /* Expand to fill remaining space */
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 10px; /* Added margin to create space */
+        }
+        #send-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            width: 100px; /* Adjust button width */
+        }
+        #send-button:disabled {
+            background-color: #6c757d; /* Disabled button color */
+            cursor: not-allowed;
+        }
+        #send-button:hover:enabled {
+            background-color: #218838; /* Hover color when enabled */
+        }
+        .chat-message {
+            margin: 10px 0;
+        }
+        .chat-message strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .chat-message div {
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="chat-container">
+        <h1 class="text-center py-3 bg-primary text-white">Historical Places ChatBot</h1>
+        <div id="chat-box"></div>
+        <div id="user-input-container">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button id="send-button" onclick="sendMessage()" disabled>Send</button>
+        </div>
+    </div>
+
+    <script>
+        var typing = false; // Flag to track whether bot is typing
+
+        function typeWriter(data) {
+            var i = -1;
+            var baseSpeed = 10; // Base typing speed
+            var minDelay = 5; // Minimum delay between characters
+            var maxDelay = 70; // Maximum delay between characters
+            function type() {
+                if (i < data.length) {
+                    var delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay; // Random delay between characters
+                    setTimeout(function() {
+                        $('#chat-box .chat-message:last-child div').append(data.charAt(i));
+                        i++;
+                        type();
+                    }, delay);
+                } else {
+                    // Typing finished, enable send button
+                    typing = false;
+                    $('#send-button').prop('disabled', false);
+                }
+            }
+            type();
+        }
+
+        function sendMessage() {
+            if (typing) return; // Don't send message if bot is already typing
+            var userInput = $('#user-input').val();
+            $('#user-input').val('');
+
+            if (userInput.trim() !== '') {
+                $('#chat-box').append('<div class="chat-message"><strong>You:</strong><div>' + userInput + '</div></div>');
+                $('#send-button').prop('disabled', true); // Disable send button while typing
+
+                $.get("/get", { msg: userInput }).done(function(data) {
+                    $('#chat-box').append('<div class="chat-message"><strong>Bot:</strong><div></div></div>');
+                    typing = true; // Set typing flag to true
+                    typeWriter(data); // Call typeWriter here instead of appending its result
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                });
+            }
+        }
+
+        $(document).ready(function() {
+            var initialResponse = "{{ initial_response }}";
+            $('#chat-box').append('<div class="chat-message"><strong>Bot:</strong><div>' + initialResponse + '</div></div>');
+        });
+
+        $(document).ready(function() {
+            $('#user-input').on('keypress', function(e) {
+                if (e.which == 13) {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
