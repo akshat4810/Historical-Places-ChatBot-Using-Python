@@ -1,5 +1,5 @@
 # Heritage-Helper-ChatBot-Using-Python
-Welcome to the Historical Places ChatBot project! This repository contains a Flask-based web application featuring an interactive chatbot that provides information about historical places. The chatbot is designed to respond to user queries with detailed descriptions and historical context for various significant locations.
+Welcome to the Heritage Helper ChatBot project! This repository contains a Flask-based web application featuring an interactive chatbot that provides information about historical places. The chatbot is designed to respond to user queries with detailed descriptions and historical context for various significant locations.
 
 # Features
 - Interactive Chat Interface: Users can type questions about historical places and receive informative responses.
